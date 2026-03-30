@@ -262,6 +262,13 @@ export default function Summary({ sessionData, setSessionData }) {
         </div>
       </div>
 
+      {sessionData.recordId && !isUploading && !uploadSuccess && !uploadError && (
+        <div className="text-center text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+          <i className="bi bi-check2-circle me-1 text-success"></i>
+          準備上傳至資料庫 Record ID: <strong className="text-dark">{sessionData.recordId}</strong>
+        </div>
+      )}
+
       <div className="row mb-5 justify-content-center g-4">
         {chartEntries.map(([chartId, dataUrl], index) => (
           <div className="col-lg-6" key={chartId}>
@@ -308,19 +315,12 @@ export default function Summary({ sessionData, setSessionData }) {
         </Alert>
       )}
 
-      {sessionData.recordId && !isUploading && !uploadSuccess && !uploadError && (
-        <div className="text-center text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-          <i className="bi bi-check2-circle me-1 text-success"></i>
-          準備上傳至資料庫 Record ID: <strong className="text-dark">{sessionData.recordId}</strong>
-        </div>
-      )}
-
       <div className="d-flex justify-content-center gap-4">
         <Button variant="outline-primary" size="lg" onClick={() => handleProcessPdf('DOWNLOAD')} disabled={isUploading}>
           {t('download_pdf')}
         </Button>
         <Button variant="primary" size="lg" onClick={() => handleProcessPdf('UPLOAD_ONLY')} disabled={isUploading}>
-          確認與上傳
+          確認並上傳
         </Button>
       </div>
 
