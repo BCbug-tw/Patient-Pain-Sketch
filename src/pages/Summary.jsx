@@ -24,7 +24,7 @@ export default function Summary({ sessionData, setSessionData }) {
 
   const chartEntries = Object.entries(sessionData.chartImages);
 
-  const handleDownload = async () => {
+  const handleProcessPdf = async (action) => {
     setIsUploading(true);
     setUploadError('');
     try {
@@ -161,31 +161,34 @@ export default function Summary({ sessionData, setSessionData }) {
     const pid = sessionData.patientId || 'EmptyPID';
     const filename = `PPS_${pid}_${namePart}${datePart}.pdf`;
 
-    // Support for iOS: use Blob with application/octet-stream to force download
     const pdfBlob = pdf.output('blob');
-    const blob = new Blob([pdfBlob], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
+    if (action === 'DOWNLOAD') {
+      const blob = new Blob([pdfBlob], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
 
-    // Extra attributes for better mobile compatibility
-    link.target = '_blank';
-    link.rel = 'noopener';
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.target = '_blank';
+      link.rel = 'noopener';
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-    setHasDownloaded(true);
-
-    if (sessionData.recordId) {
-       await uploadToRedcap(pdfBlob);
-    } else {
-       setIsUploading(false);
+      setHasDownloaded(true);
+      setIsUploading(false);
+    } else if (action === 'UPLOAD_ONLY') {
+      if (sessionData.recordId) {
+        await uploadToRedcap(pdfBlob);
+      } else {
+        setIsUploading(false);
+        setUploadError('無法上傳：尚未綁定 REDCap Record ID');
+      }
     }
+
     } catch (err) {
       setIsUploading(false);
       setUploadError('處理 PDF 時發生錯誤: ' + err.message);
@@ -313,9 +316,11 @@ export default function Summary({ sessionData, setSessionData }) {
       )}
 
       <div className="d-flex justify-content-center gap-4">
-        <Button variant="outline-primary" size="lg" onClick={handleRestart} disabled={isUploading}>{t('start_over')}</Button>
-        <Button variant="primary" size="lg" onClick={handleDownload} disabled={isUploading}>
-          {t('download_pdf')} {sessionData.recordId && "並上傳 REDCap"}
+        <Button variant="outline-primary" size="lg" onClick={() => handleProcessPdf('DOWNLOAD')} disabled={isUploading}>
+          {t('download_pdf')}
+        </Button>
+        <Button variant="primary" size="lg" onClick={() => handleProcessPdf('UPLOAD_ONLY')} disabled={isUploading}>
+          確認與上傳
         </Button>
       </div>
 

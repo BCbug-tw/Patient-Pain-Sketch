@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
 export default function Home({ sessionData, setSessionData }) {
@@ -13,6 +13,39 @@ export default function Home({ sessionData, setSessionData }) {
     date: sessionData?.date || new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' })
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  React.useEffect(() => {
+    const fetchPatientData = async () => {
+      // If no REDCap ID, just let them type manually
+      if (!sessionData?.recordId) return;
+      // If we already have a patientId stored in session, assume it's fetched or typed already
+      if (sessionData.patientId) return;
+
+      setIsLoading(true);
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${apiUrl}/api/patient/${sessionData.recordId}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setFormData(prev => ({
+              ...prev,
+              fullName: result.data.fullName || prev.fullName,
+              patientId: result.data.patientId || prev.patientId,
+              dob: result.data.dob || prev.dob
+            }));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch patient data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPatientData();
+  }, [sessionData?.recordId, sessionData?.patientId]);
 
   const handleNext = () => {
     if (!formData.patientId.trim()) {
@@ -41,6 +74,13 @@ export default function Home({ sessionData, setSessionData }) {
         <Col md={8} lg={6}>
           <Card className="shadow-sm border-0 bg-white">
             <Card.Body className="p-4">
+              {isLoading && (
+                <div className="text-center mb-4 text-secondary">
+                  <Spinner animation="border" size="sm" className="me-2" />
+                  自動帶入病患資料中...
+                </div>
+              )}
+
               <Form.Group className="mb-4">
                 <Form.Label className="fw-bold fs-6 mb-2 text-primary">{t('full_name')}</Form.Label>
                 <Form.Control 
@@ -94,6 +134,7 @@ export default function Home({ sessionData, setSessionData }) {
                 size="lg" 
                 className="w-100 mt-2"
                 onClick={handleNext}
+                disabled={isLoading}
               >
                 {t('next')}
               </Button>
