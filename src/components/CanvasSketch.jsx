@@ -8,6 +8,7 @@ const CanvasSketch = forwardRef(({ imageUrl, mode = 'point', initialMarks, maxMa
   const [marks, setMarks] = useState(initialMarks || []);
   const [currentStartPoint, setCurrentStartPoint] = useState(null);
   const [currentMousePos, setCurrentMousePos] = useState(null);
+  const [canvasReady, setCanvasReady] = useState(0);
 
   // Re-sync marks ONLY when the chart (imageUrl) changes, not on every re-render
   const prevImageUrlRef = useRef(imageUrl);
@@ -66,10 +67,9 @@ const CanvasSketch = forwardRef(({ imageUrl, mode = 'point', initialMarks, maxMa
       const ctx = pdfCanvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Force redraw marks after image is rendered and coordinate system is strictly ready
-      const marksCtx = marksCanvas.getContext('2d');
-      marksCtx.clearRect(0, 0, width, height);
-      drawAllMarks(marksCtx, marks, mode, currentMousePos, currentStartPoint);
+      // Force redraw marks after image is rendered and coordinate system is strictly ready.
+      // We use state to trigger the redraw effect to ensure we use the freshest React state (avoiding stale closures).
+      setCanvasReady(Date.now());
     };
     img.onerror = (err) => {
       console.error('Error loading image:', err);
@@ -83,7 +83,7 @@ const CanvasSketch = forwardRef(({ imageUrl, mode = 'point', initialMarks, maxMa
       ctx.clearRect(0, 0, marksCanvasRef.current.width, marksCanvasRef.current.height);
       drawAllMarks(ctx, marks, mode, currentMousePos, currentStartPoint);
     }
-  }, [marks, mode, currentMousePos, currentStartPoint]);
+  }, [marks, mode, currentMousePos, currentStartPoint, canvasReady]);
 
 
 
