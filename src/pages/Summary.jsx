@@ -29,165 +29,165 @@ export default function Summary({ sessionData, setSessionData }) {
     setUploadError('');
     try {
       const pdf = new jsPDF({
-      orientation: 'p',
-      unit: 'px',
-      format: [595, 842]
-    });
-
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '';
-      return dateStr.replace(/-/g, '/');
-    };
-
-    // Draw Patient Information on the first blank page
-    const drawInfoPageImage = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 595 * 2;
-      canvas.height = 842 * 2;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(2, 2);
-
-      // White background
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, 595, 842);
-
-      ctx.fillStyle = 'black';
-      ctx.font = 'bold 24px "Microsoft JhengHei", "PingFang TC", sans-serif';
-      ctx.fillText(t('home_title'), 50, 80);
-
-      ctx.beginPath();
-      ctx.moveTo(50, 100);
-      ctx.lineTo(545, 100);
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.font = '16px "Microsoft JhengHei", "PingFang TC", sans-serif';
-      let y = 140;
-      const lineSpacing = 35;
-
-      ctx.fillText(`${t('full_name')}: ${sessionData.fullName || ''}`, 50, y);
-      y += lineSpacing;
-      ctx.fillText(`${t('patient_id')}: ${sessionData.patientId || ''}`, 50, y);
-      y += lineSpacing;
-      ctx.fillText(`${t('dob')}: ${formatDate(sessionData.dob)}`, 50, y);
-      y += lineSpacing;
-      ctx.fillText(`${t('date')}: ${formatDate(sessionData.date)}`, 50, y);
-
-      y += lineSpacing;
-      ctx.fillText(`${t('marked_charts')}:`, 50, y);
-      chartEntries.forEach(([chartId]) => {
-        y += 28;
-        ctx.fillText(`- ${t(`term_${chartId.replace(' ', '_')}`)}`, 70, y);
+        orientation: 'p',
+        unit: 'px',
+        format: [595, 842]
       });
 
-      return canvas.toDataURL('image/jpeg', 0.9);
-    };
+      const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        return dateStr.replace(/-/g, '/');
+      };
 
-    // Draw Chart Title on the chart pages
-    const drawChartTitleImage = (titleText) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 595 * 2;
-      canvas.height = 842 * 2;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(2, 2);
-      ctx.clearRect(0, 0, 595, 842);
+      // Draw Patient Information on the first blank page
+      const drawInfoPageImage = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 595 * 2;
+        canvas.height = 842 * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
 
-      ctx.fillStyle = 'black';
-      ctx.font = 'bold 24px "Microsoft JhengHei", "PingFang TC", sans-serif';
+        // White background
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, 595, 842);
 
-      const textWidth = ctx.measureText(titleText).width;
-      // Center the title horizontally, near the top
-      ctx.fillText(titleText, (595 - textWidth) / 2, 40);
+        ctx.fillStyle = 'black';
+        ctx.font = 'bold 24px "Microsoft JhengHei", "PingFang TC", sans-serif';
+        ctx.fillText(t('home_title'), 50, 80);
 
-      return canvas.toDataURL('image/png');
-    };
+        ctx.beginPath();
+        ctx.moveTo(50, 100);
+        ctx.lineTo(545, 100);
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-    // Helper to compress image
-    const compressImage = (base64Str, quality = 0.6) => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.src = base64Str;
-      });
-    };
+        ctx.font = '16px "Microsoft JhengHei", "PingFang TC", sans-serif';
+        let y = 140;
+        const lineSpacing = 35;
 
-    // 1. Add Info Page
-    const infoImg = drawInfoPageImage();
-    pdf.addImage(infoImg, 'JPEG', 0, 0, 595, 842, undefined, 'FAST');
+        ctx.fillText(`${t('full_name')}: ${sessionData.fullName || ''}`, 50, y);
+        y += lineSpacing;
+        ctx.fillText(`${t('patient_id')}: ${sessionData.patientId || ''}`, 50, y);
+        y += lineSpacing;
+        ctx.fillText(`${t('dob')}: ${formatDate(sessionData.dob)}`, 50, y);
+        y += lineSpacing;
+        ctx.fillText(`${t('date')}: ${formatDate(sessionData.date)}`, 50, y);
 
-    // 2. Add Chart Pages
-    for (const [chartId, originalDataUrl] of chartEntries) {
-      const dataUrl = await compressImage(originalDataUrl);
-      pdf.addPage();
+        y += lineSpacing;
+        ctx.fillText(`${t('marked_charts')}:`, 50, y);
+        chartEntries.forEach(([chartId]) => {
+          y += 28;
+          ctx.fillText(`- ${t(`term_${chartId.replace(' ', '_')}`)}`, 70, y);
+        });
 
-      const titleText = t(`term_${chartId.replace(' ', '_')}`);
-      const titleImg = drawChartTitleImage(titleText);
+        return canvas.toDataURL('image/jpeg', 0.9);
+      };
 
-      // Get image properties to maintain aspect ratio
-      const props = pdf.getImageProperties(dataUrl);
-      const imgWidth = props.width;
-      const imgHeight = props.height;
+      // Draw Chart Title on the chart pages
+      const drawChartTitleImage = (titleText) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 595 * 2;
+        canvas.height = 842 * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
+        ctx.clearRect(0, 0, 595, 842);
 
-      // Calculate scaled dimensions (PDF is 595x842)
-      const maxWidth = 595 - 40; // 20px padding left/right
-      const maxHeight = 842 - 100; // Leave room for title at top (y=60) and some margin
+        ctx.fillStyle = 'black';
+        ctx.font = 'bold 24px "Microsoft JhengHei", "PingFang TC", sans-serif';
 
-      const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
-      const printWidth = imgWidth * ratio;
-      const printHeight = imgHeight * ratio;
+        const textWidth = ctx.measureText(titleText).width;
+        // Center the title horizontally, near the top
+        ctx.fillText(titleText, (595 - textWidth) / 2, 40);
 
-      // Center horizontally
-      const startX = (595 - printWidth) / 2;
-      // Start vertically below the title
-      const startY = 80;
+        return canvas.toDataURL('image/png');
+      };
 
-      pdf.addImage(dataUrl, 'JPEG', startX, startY, printWidth, printHeight, undefined, 'FAST');
+      // Helper to compress image
+      const compressImage = (base64Str, quality = 0.6) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = base64Str;
+        });
+      };
 
-      // Draw Title Overlay (transparent background)
-      pdf.addImage(titleImg, 'PNG', 0, 0, 595, 842, undefined, 'FAST');
-    }
+      // 1. Add Info Page
+      const infoImg = drawInfoPageImage();
+      pdf.addImage(infoImg, 'JPEG', 0, 0, 595, 842, undefined, 'FAST');
 
-    const namePart = sessionData.fullName ? `${sessionData.fullName}_` : '';
-    const datePart = (sessionData.date || '').replace(/-/g, '');
-    const pid = sessionData.patientId || 'EmptyPID';
-    const filename = `PPS_${pid}_${namePart}${datePart}.pdf`;
+      // 2. Add Chart Pages
+      for (const [chartId, originalDataUrl] of chartEntries) {
+        const dataUrl = await compressImage(originalDataUrl);
+        pdf.addPage();
 
-    const pdfBlob = pdf.output('blob');
+        const titleText = t(`term_${chartId.replace(' ', '_')}`);
+        const titleImg = drawChartTitleImage(titleText);
 
-    if (action === 'DOWNLOAD') {
-      const blob = new Blob([pdfBlob], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
+        // Get image properties to maintain aspect ratio
+        const props = pdf.getImageProperties(dataUrl);
+        const imgWidth = props.width;
+        const imgHeight = props.height;
 
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.target = '_blank';
-      link.rel = 'noopener';
+        // Calculate scaled dimensions (PDF is 595x842)
+        const maxWidth = 595 - 40; // 20px padding left/right
+        const maxHeight = 842 - 100; // Leave room for title at top (y=60) and some margin
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+        const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
+        const printWidth = imgWidth * ratio;
+        const printHeight = imgHeight * ratio;
 
-      setHasDownloaded(true);
-      setIsUploading(false);
-    } else if (action === 'UPLOAD_ONLY') {
-      if (sessionData.recordId) {
-        await uploadToRedcap(pdfBlob);
-      } else {
-        setIsUploading(false);
-        setUploadError('無法上傳：尚未綁定 REDCap Record ID');
+        // Center horizontally
+        const startX = (595 - printWidth) / 2;
+        // Start vertically below the title
+        const startY = 80;
+
+        pdf.addImage(dataUrl, 'JPEG', startX, startY, printWidth, printHeight, undefined, 'FAST');
+
+        // Draw Title Overlay (transparent background)
+        pdf.addImage(titleImg, 'PNG', 0, 0, 595, 842, undefined, 'FAST');
       }
-    }
+
+      const namePart = sessionData.fullName ? `${sessionData.fullName}_` : '';
+      const datePart = (sessionData.date || '').replace(/-/g, '');
+      const pid = sessionData.patientId || 'EmptyPID';
+      const filename = `PPS_${pid}_${namePart}${datePart}.pdf`;
+
+      const pdfBlob = pdf.output('blob');
+
+      if (action === 'DOWNLOAD') {
+        const blob = new Blob([pdfBlob], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.target = '_blank';
+        link.rel = 'noopener';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        setHasDownloaded(true);
+        setIsUploading(false);
+      } else if (action === 'UPLOAD_ONLY') {
+        if (sessionData.recordId) {
+          await uploadToRedcap(pdfBlob);
+        } else {
+          setIsUploading(false);
+          setUploadError('無法上傳：尚未綁定 REDCap Record ID');
+        }
+      }
 
     } catch (err) {
       setIsUploading(false);
@@ -205,18 +205,18 @@ export default function Summary({ sessionData, setSessionData }) {
 
       // 取用環境變數中的後端 API URL (如果未設定則視為本機開發)
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      
+
       const response = await fetch(`${apiUrl}/api/upload`, {
         method: 'POST',
         body: formData
       });
-      
+
       if (!response.ok) {
-          throw new Error(`上傳失敗，錯誤碼：${response.status}`);
+        throw new Error(`上傳失敗，錯誤碼：${response.status}`);
       }
       const data = await response.json();
       if (!data.success) {
-          throw new Error(data.error || '伺服器端發生錯誤');
+        throw new Error(data.error || '伺服器端發生錯誤');
       }
       setUploadSuccess(true);
     } catch (err) {
@@ -256,13 +256,6 @@ export default function Summary({ sessionData, setSessionData }) {
       <div className="text-center mb-4">
         <h2 className="fw-bold text-primary mb-2">{t('summary_title')}</h2>
 
-        {sessionData.recordId && (
-           <div className="alert alert-info py-2 d-inline-block shadow-sm mb-3">
-             <i className="bi bi-link-45deg me-1"></i>
-             已連結 REDCap (Record ID: <strong>{sessionData.recordId}</strong>)
-           </div>
-        )}
-
         <div className="mx-auto mb-4 p-2 text-center text-secondary" style={{ maxWidth: '700px', fontSize: '14px' }}>
           <i className="bi bi-info-circle me-2"></i>
           {t('summary_instr')}
@@ -299,20 +292,27 @@ export default function Summary({ sessionData, setSessionData }) {
 
       {sessionData.recordId && isUploading && (
         <div className="text-center mb-4 text-secondary">
-           <Spinner animation="border" size="sm" className="me-2" />
-           正在自動上傳至 REDCap (Record: {sessionData.recordId})...
+          <Spinner animation="border" size="sm" className="me-2" />
+          正在自動上傳至資料庫 (Record: {sessionData.recordId})...
         </div>
       )}
       {sessionData.recordId && uploadSuccess && (
         <Alert variant="success" className="text-center shadow-sm w-75 mx-auto mb-4">
-           <i className="bi bi-check-circle-fill me-2"></i>
-           檔案已成功儲存至 REDCap！
+          <i className="bi bi-check-circle-fill me-2"></i>
+          檔案已成功儲存至資料庫！
         </Alert>
       )}
       {sessionData.recordId && uploadError && (
         <Alert variant="danger" className="text-center shadow-sm w-75 mx-auto mb-4">
-           上傳 REDCap 失敗：{uploadError}
+          上傳資料庫失敗：{uploadError}
         </Alert>
+      )}
+
+      {sessionData.recordId && !isUploading && !uploadSuccess && !uploadError && (
+        <div className="text-center text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+          <i className="bi bi-check2-circle me-1 text-success"></i>
+          準備上傳至資料庫 Record ID: <strong className="text-dark">{sessionData.recordId}</strong>
+        </div>
       )}
 
       <div className="d-flex justify-content-center gap-4">
