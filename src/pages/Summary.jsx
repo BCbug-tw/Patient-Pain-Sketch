@@ -185,7 +185,7 @@ export default function Summary({ sessionData, setSessionData }) {
           await uploadToRedcap(pdfBlob);
         } else {
           setIsUploading(false);
-          setUploadError('無法上傳：尚未綁定 REDCap Record ID');
+          setUploadError(t('upload_error_not_bound'));
         }
       }
 
@@ -216,10 +216,10 @@ export default function Summary({ sessionData, setSessionData }) {
       }
       const data = await response.json();
       if (!data.success) {
-        throw new Error(data.error || '伺服器端發生錯誤');
+        throw new Error(data.error || t('upload_error_server'));
       }
       setUploadSuccess(true);
-      
+
       // Delay navigation slightly so the patient sees the green success message
       setTimeout(() => {
         navigate('/success');
@@ -298,25 +298,25 @@ export default function Summary({ sessionData, setSessionData }) {
       {sessionData.recordId && isUploading && (
         <div className="text-center mb-4 text-secondary">
           <Spinner animation="border" size="sm" className="me-2" />
-          正在自動上傳至資料庫 (Record: {sessionData.recordId})...
+          {t('uploading')} (Record: {sessionData.recordId})...
         </div>
       )}
       {sessionData.recordId && uploadSuccess && (
         <Alert variant="success" className="text-center shadow-sm w-75 mx-auto mb-4">
           <i className="bi bi-check-circle-fill me-2"></i>
-          檔案已成功儲存至資料庫！
+          {t('upload_success')}
         </Alert>
       )}
       {sessionData.recordId && uploadError && (
         <Alert variant="danger" className="text-center shadow-sm w-75 mx-auto mb-4">
-          上傳資料庫失敗：{uploadError}
+          {t('upload_fail')}{uploadError}
         </Alert>
       )}
 
       {sessionData.recordId && !isUploading && !uploadSuccess && !uploadError && (
         <div className="text-center text-muted mb-3" style={{ fontSize: '0.9rem' }}>
           <i className="bi bi-check2-circle me-1 text-success"></i>
-          準備上傳至資料庫 Record ID: <strong className="text-dark">{sessionData.recordId}</strong>
+          {t('prep_upload')} (Record ID: <strong className="text-dark">{sessionData.recordId}</strong>)
         </div>
       )}
 
@@ -325,7 +325,7 @@ export default function Summary({ sessionData, setSessionData }) {
           {t('download_pdf')}
         </Button>
         <Button variant="primary" size="lg" onClick={() => handleProcessPdf('UPLOAD_ONLY')} disabled={isUploading}>
-          確認並上傳
+          {t('confirm_and_upload')}
         </Button>
       </div>
 

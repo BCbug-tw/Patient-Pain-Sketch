@@ -77,7 +77,7 @@ export default function Home({ sessionData, setSessionData }) {
               {isLoading && (
                 <div className="text-center mb-4 text-secondary">
                   <Spinner animation="border" size="sm" className="me-2" />
-                  自動帶入病患資料中...
+                  {t('loading_patient_data')}
                 </div>
               )}
 
