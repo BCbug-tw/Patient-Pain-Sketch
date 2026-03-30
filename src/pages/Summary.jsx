@@ -24,8 +24,11 @@ export default function Summary({ sessionData, setSessionData }) {
 
   const chartEntries = Object.entries(sessionData.chartImages);
 
-  const handleDownload = () => {
-    const pdf = new jsPDF({
+  const handleDownload = async () => {
+    setIsUploading(true);
+    setUploadError('');
+    try {
+      const pdf = new jsPDF({
       orientation: 'p',
       unit: 'px',
       format: [595, 842]
@@ -99,12 +102,31 @@ export default function Summary({ sessionData, setSessionData }) {
       return canvas.toDataURL('image/png');
     };
 
+    // Helper to compress image
+    const compressImage = (base64Str, quality = 0.6) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = base64Str;
+      });
+    };
+
     // 1. Add Info Page
     const infoImg = drawInfoPageImage();
-    pdf.addImage(infoImg, 'JPEG', 0, 0, 595, 842);
+    pdf.addImage(infoImg, 'JPEG', 0, 0, 595, 842, undefined, 'FAST');
 
     // 2. Add Chart Pages
-    chartEntries.forEach(([chartId, dataUrl]) => {
+    for (const [chartId, originalDataUrl] of chartEntries) {
+      const dataUrl = await compressImage(originalDataUrl);
       pdf.addPage();
 
       const titleText = t(`term_${chartId.replace(' ', '_')}`);
@@ -128,11 +150,11 @@ export default function Summary({ sessionData, setSessionData }) {
       // Start vertically below the title
       const startY = 80;
 
-      pdf.addImage(dataUrl, 'JPEG', startX, startY, printWidth, printHeight);
+      pdf.addImage(dataUrl, 'JPEG', startX, startY, printWidth, printHeight, undefined, 'FAST');
 
       // Draw Title Overlay (transparent background)
-      pdf.addImage(titleImg, 'PNG', 0, 0, 595, 842);
-    });
+      pdf.addImage(titleImg, 'PNG', 0, 0, 595, 842, undefined, 'FAST');
+    }
 
     const namePart = sessionData.fullName ? `${sessionData.fullName}_` : '';
     const datePart = (sessionData.date || '').replace(/-/g, '');
@@ -160,7 +182,13 @@ export default function Summary({ sessionData, setSessionData }) {
     setHasDownloaded(true);
 
     if (sessionData.recordId) {
-       uploadToRedcap(pdfBlob);
+       await uploadToRedcap(pdfBlob);
+    } else {
+       setIsUploading(false);
+    }
+    } catch (err) {
+      setIsUploading(false);
+      setUploadError('處理 PDF 時發生錯誤: ' + err.message);
     }
   };
 
