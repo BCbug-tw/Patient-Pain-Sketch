@@ -219,10 +219,15 @@ export default function Summary({ sessionData, setSessionData }) {
         throw new Error(data.error || '伺服器端發生錯誤');
       }
       setUploadSuccess(true);
+      
+      // Delay navigation slightly so the patient sees the green success message
+      setTimeout(() => {
+        navigate('/success');
+      }, 1500);
+
     } catch (err) {
       setUploadError(err.message);
-    } finally {
-      setIsUploading(false);
+      setIsUploading(false); // Only set to false on error so spinner/disabled lock persists during redirect delay
     }
   };
 
@@ -261,13 +266,6 @@ export default function Summary({ sessionData, setSessionData }) {
           {t('summary_instr')}
         </div>
       </div>
-
-      {sessionData.recordId && !isUploading && !uploadSuccess && !uploadError && (
-        <div className="text-center text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-          <i className="bi bi-check2-circle me-1 text-success"></i>
-          準備上傳至資料庫 Record ID: <strong className="text-dark">{sessionData.recordId}</strong>
-        </div>
-      )}
 
       <div className="row mb-5 justify-content-center g-4">
         {chartEntries.map(([chartId, dataUrl], index) => (
@@ -313,6 +311,13 @@ export default function Summary({ sessionData, setSessionData }) {
         <Alert variant="danger" className="text-center shadow-sm w-75 mx-auto mb-4">
           上傳資料庫失敗：{uploadError}
         </Alert>
+      )}
+
+      {sessionData.recordId && !isUploading && !uploadSuccess && !uploadError && (
+        <div className="text-center text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+          <i className="bi bi-check2-circle me-1 text-success"></i>
+          準備上傳至資料庫 Record ID: <strong className="text-dark">{sessionData.recordId}</strong>
+        </div>
       )}
 
       <div className="d-flex justify-content-center gap-4">

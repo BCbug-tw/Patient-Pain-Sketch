@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import SelectCharts from './pages/SelectCharts';
 import Detail from './pages/Detail';
 import Summary from './pages/Summary';
+import Success from './pages/Success';
 import Header from './components/Header';
 import { useState, useEffect } from 'react';
 
@@ -64,6 +65,10 @@ function App() {
           <Route 
             path="/summary" 
             element={<Summary sessionData={sessionData} setSessionData={setSessionData} />} 
+          />
+          <Route 
+            path="/success" 
+            element={<Success />} 
           />
         </Routes>
       </div>
