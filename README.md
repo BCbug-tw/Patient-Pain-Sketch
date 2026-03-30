@@ -30,7 +30,7 @@ The PPS system aims to streamline the clinical workflow by transitioning from pa
 4. **Review & Export**:
    - Preview all marked charts on the Summary page.
    - Click "Download PDF Report" to save the file locally.
-   - Click "Start Over" to clear the session for the next patient.
+   - Click "Start Over" to clear the session for the next patient. 
 
 ## Technical Architecture
 
