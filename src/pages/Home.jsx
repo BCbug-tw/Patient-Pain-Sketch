@@ -25,7 +25,11 @@ export default function Home({ sessionData, setSessionData }) {
       setIsLoading(true);
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/patient/${sessionData.recordId}`);
+        let fetchUrl = `${apiUrl}/api/patient/${sessionData.recordId}`;
+        if (sessionData.timestamp) {
+          fetchUrl += `?t=${encodeURIComponent(sessionData.timestamp)}`;
+        }
+        const response = await fetch(fetchUrl);
         if (response.ok) {
           const result = await response.json();
           if (result.success && result.data) {

@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 function App() {
   const [sessionData, setSessionData] = useState({
     recordId: '', // REDCap ID
+    timestamp: '', // REDCap validation timestamp
     patientId: '', // MRN
     fullName: '',
     dob: '',
@@ -25,14 +26,20 @@ function App() {
     window.addEventListener('error', handleErr);
     window.addEventListener('unhandledrejection', (e) => handleErr(e.reason));
 
-    // 解析從 REDCap 導向的 record_id
+    // 解析從 REDCap 導向的 record_id 與 timestamp (t)
     const searchString = window.location.href.split('?')[1];
     if (searchString) {
       const pureSearch = searchString.split('#')[0];
       const params = new URLSearchParams(pureSearch);
       const rid = params.get('record_id');
+      const timestamp = params.get('t');
+      
       if (rid) {
-        setSessionData(prev => ({ ...prev, recordId: rid }));
+        setSessionData(prev => ({ 
+          ...prev, 
+          recordId: rid,
+          timestamp: timestamp || ''
+        }));
       }
     }
 
