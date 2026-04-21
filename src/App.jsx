@@ -15,6 +15,7 @@ function App() {
     fullName: '',
     dob: '',
     date: new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' }), // YYYY-MM-DD for date input
+    survey: 'FU', // Default survey type
     selectedCharts: [], // Array of selected chart IDs
     chartImages: {}, // Map of chartId -> Data URL
     marksData: {} // Map of chartId -> Raw Marks Array for editing
@@ -33,12 +34,14 @@ function App() {
       const params = new URLSearchParams(pureSearch);
       const rid = params.get('record_id');
       const timestamp = params.get('t');
+      const survey = params.get('survey');
       
       if (rid) {
         setSessionData(prev => ({ 
           ...prev, 
           recordId: rid,
-          timestamp: timestamp || ''
+          timestamp: timestamp || '',
+          survey: survey || 'FU'
         }));
       }
     }

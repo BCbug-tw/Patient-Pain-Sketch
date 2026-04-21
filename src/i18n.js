@@ -20,6 +20,8 @@ const resources = {
       "start_sketch": "Start Marking",
       "download_pdf": "Download PDF Report",
       "marked_charts": "Marked Charts",
+      "survey_FC": "First Clinic",
+      "survey_FU": "Follow-up",
 
       "back": "Back",
       "back_to_selection": "Back to Selection",
@@ -80,6 +82,8 @@ const resources = {
       "start_sketch": "開始標記",
       "download_pdf": "下載 PDF",
       "marked_charts": "標記圖表",
+      "survey_FC": "初診",
+      "survey_FU": "複診",
 
       "back": "返回",
       "back_to_selection": "返回選擇",

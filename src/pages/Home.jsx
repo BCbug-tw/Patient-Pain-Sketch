@@ -26,9 +26,12 @@ export default function Home({ sessionData, setSessionData }) {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         let fetchUrl = `${apiUrl}/api/patient/${sessionData.recordId}`;
-        if (sessionData.timestamp) {
-          fetchUrl += `?t=${encodeURIComponent(sessionData.timestamp)}`;
-        }
+        const queryParams = new URLSearchParams();
+        if (sessionData.timestamp) queryParams.append('t', sessionData.timestamp);
+        if (sessionData.survey) queryParams.append('survey', sessionData.survey);
+        
+        const queryString = queryParams.toString();
+        if (queryString) fetchUrl += `?${queryString}`;
         const response = await fetch(fetchUrl);
         if (response.ok) {
           const result = await response.json();
@@ -69,7 +72,12 @@ export default function Home({ sessionData, setSessionData }) {
 
   return (
     <Container className="py-5">
-      <h2 className="text-center mb-4 fw-bold text-primary">{t('home_title')}</h2>
+      <h2 className="text-center mb-4 fw-bold text-primary">
+        {t('home_title')} 
+        <span className="ms-2 badge bg-primary fs-6 fw-normal" style={{ verticalAlign: 'middle' }}>
+          {t(`survey_${sessionData.survey || 'FU'}`)}
+        </span>
+      </h2>
       <p className="text-center text-muted mb-5">
         {t('home_subtitle')}
       </p>

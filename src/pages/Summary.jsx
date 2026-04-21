@@ -202,6 +202,9 @@ export default function Summary({ sessionData, setSessionData }) {
       const formData = new FormData();
       formData.append('file', pdfBlob, `PPS_record_${sessionData.recordId}.pdf`);
       formData.append('record_id', sessionData.recordId);
+      if (sessionData.survey) {
+        formData.append('survey', sessionData.survey);
+      }
 
       // 取用環境變數中的後端 API URL (如果未設定則視為本機開發)
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -259,7 +262,12 @@ export default function Summary({ sessionData, setSessionData }) {
   return (
     <Container className="py-4">
       <div className="text-center mb-4">
-        <h2 className="fw-bold text-primary mb-2">{t('summary_title')}</h2>
+        <h2 className="fw-bold text-primary mb-2">
+          {t('summary_title')}
+          <span className="ms-2 badge bg-primary fs-6 fw-normal" style={{ verticalAlign: 'middle' }}>
+            {t(`survey_${sessionData.survey || 'FU'}`)}
+          </span>
+        </h2>
 
         <div className="mx-auto mb-4 p-2 text-center text-secondary" style={{ maxWidth: '700px', fontSize: '14px' }}>
           <i className="bi bi-info-circle me-2"></i>
