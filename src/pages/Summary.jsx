@@ -203,7 +203,8 @@ export default function Summary({ sessionData, setSessionData }) {
     setUploadError('');
     try {
       const formData = new FormData();
-      formData.append('file', pdfBlob, `PPS_record_${sessionData.recordId}.pdf`);
+      const surveySuffix = sessionData.survey ? `_${sessionData.survey.toLowerCase()}` : '';
+      formData.append('file', pdfBlob, `PPS_record_${sessionData.recordId}${surveySuffix}.pdf`);
       formData.append('record_id', sessionData.recordId);
       if (sessionData.survey) {
         formData.append('survey', sessionData.survey);
