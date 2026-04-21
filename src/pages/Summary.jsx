@@ -72,6 +72,8 @@ export default function Summary({ sessionData, setSessionData }) {
         ctx.fillText(`${t('dob')}: ${formatDate(sessionData.dob)}`, 50, y);
         y += lineSpacing;
         ctx.fillText(`${t('date')}: ${formatDate(sessionData.date)}`, 50, y);
+        y += lineSpacing;
+        ctx.fillText(`${t('survey_type')}: ${t(`survey_${sessionData.survey || 'FU'}`)}`, 50, y);
 
         y += lineSpacing;
         ctx.fillText(`${t('marked_charts')}:`, 50, y);
@@ -159,7 +161,8 @@ export default function Summary({ sessionData, setSessionData }) {
       const namePart = sessionData.fullName ? `${sessionData.fullName}_` : '';
       const datePart = (sessionData.date || '').replace(/-/g, '');
       const pid = sessionData.patientId || 'EmptyPID';
-      const filename = `PPS_${pid}_${namePart}${datePart}.pdf`;
+      const surveySuffix = sessionData.survey ? `_${sessionData.survey.toLowerCase()}` : '';
+      const filename = `PPS_${pid}_${namePart}${datePart}${surveySuffix}.pdf`;
 
       const pdfBlob = pdf.output('blob');
 
