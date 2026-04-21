@@ -17,7 +17,7 @@ const resources = {
       "upper_limb": "Upper Limb",
       "lower_limb": "Lower Limb",
       "lower_limb": "Lower Limb",
-      "select_charts_title": "Select Charts for Marking",      "select_charts_subtitle": "Multi-selection allowed. Charts will appear in sequence.",
+      "select_charts_title": "Select Charts for Marking", "select_charts_subtitle": "Multi-selection allowed. Charts will appear in sequence.",
       "start_sketch": "Start Marking",
       "download_pdf": "Download PDF Report",
       "marked_charts": "Marked Charts",
@@ -80,7 +80,7 @@ const resources = {
       "upper_limb": "上肢",
       "lower_limb": "下肢",
       "lower_limb": "下肢",
-      "select_charts_title": "選擇需要標記的圖表",      "select_charts_subtitle": "您選擇的圖表將會依序出現供您標記(可多選)。",
+      "select_charts_title": "選擇需要標記的圖表", "select_charts_subtitle": "您選擇的圖表將會依序出現供您標記(可多選)。",
       "start_sketch": "開始標記",
       "download_pdf": "下載 PDF",
       "marked_charts": "標記圖表",
@@ -98,12 +98,12 @@ const resources = {
       "cancel": "取消",
 
       "summary_title": "疼痛圖表標記結果",
-      "summary_instr": "使用說明：您可以在此檢視各圖表標記結果。若需修改，點擊圖表右下的「編輯」即可重回標記頁面。確認無誤後點擊「下載 PDF」儲存檔案。",
+      "summary_instr": "使用說明：您可以在此檢視各圖表標記結果。若需修改，點擊圖表右下的「編輯」即可重回標記頁面。確認無誤後點擊「確認並上傳」將資料上傳至資料庫。",
 
       "detail_instr": "使用說明：您可以從下方工具列選擇工具。單點(X)：點擊圖表可標記。箭頭：按住拖曳可繪製。橡皮擦：點擊或拖曳標記即可清除。",
 
       "restart_warning_title": "警告：尚未存檔",
-      "restart_warning_msg": "您尚未下載 PDF 報告。按下重新開始將會清除目前的標記並回到首頁。您確定要繼續嗎？",
+      "restart_warning_msg": "您尚未上傳資料至資料庫或下載PDF。按下重新開始將會清除目前的標記並回到首頁。您確定要繼續嗎？",
       "restart_confirm": "確定重新開始",
 
       "loading_patient_data": "自動帶入病患資料中...",
